@@ -19,7 +19,9 @@ app.ondrop = (e) => {
     e.preventDefault()
 
     const title = document.getElementById('title');
-    title.parentNode.removeChild(title);
+    if (title) {
+        title.parentNode.removeChild(title);
+    }
 
     for (let f of e.dataTransfer.files) {
         console.log('File(s) you dragged here: ', f.path)

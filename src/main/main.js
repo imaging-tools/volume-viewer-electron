@@ -2,7 +2,16 @@ const { ipcMain, app, BrowserWindow } = require('electron');
 const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
+const crypto = require('crypto');
 const {CACHE_DIRECTORY, SERVICE_DIRECTORY} = require('./constants');
+
+// Set up directory /image-service/cache
+if (!fs.existsSync(SERVICE_DIRECTORY)) {
+    fs.mkdirSync(SERVICE_DIRECTORY);
+}
+if (!fs.existsSync(`${SERVICE_DIRECTORY}/${CACHE_DIRECTORY}`)) {
+    fs.mkdirSync(`${SERVICE_DIRECTORY}/${CACHE_DIRECTORY}`);
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -55,16 +64,40 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+function sha256(x) {
+    return crypto.createHash('sha256').update(x, 'utf8').digest('hex');
+}
 
+function getCacheDir(srcPath) {
+    let hash = sha256(srcPath);
+    return CACHE_DIRECTORY + '/' + hash + '/';
+}
+
+function getAtlasName(filename) {
+    return filename+'_atlas.json';
+}
+
+function getFilePathsAndName(filePath, fileName) {
+    const srcPath = path.normalize(filePath);
+    const relCachePath = getCacheDir(srcPath);
+    const name = fileName || path.basename(srcPath);
+    const fullFolderPath = path.join(SERVICE_DIRECTORY, relCachePath);
+    const fullAtlasJsonPath = path.join(fullFolderPath, getAtlasName(name));
+    return {srcPath, relCachePath, fullFolderPath, fullAtlasJsonPath, name};
+}
+
+const PythonShell = require('python-shell');
 ipcMain.on('filereceived', (event, filePath) => {
     console.log('Received file ' + filePath);
+    const {relCachePath} = getFilePathsAndName(filePath);
+    const options = {
+        pythonPath: '/Users/lisajoy/virtualenvs/aicsImage3/bin/python',
+        args: [filePath, path.join('.', SERVICE_DIRECTORY, relCachePath)]
+    };
 
+    PythonShell.run('convert.py', options, function (err, results) {
+        if (err) console.log(err);
+        // results is an array consisting of messages collected during execution
+        console.log('results: %j', results);
+    });
 });
-
-// Set up directory /image-service/cache
-// if (!fs.existsSync(SERVICE_DIRECTORY)) {
-//     fs.mkdirSync(SERVICE_DIRECTORY);
-// }
-// if (!fs.existsSync(`${SERVICE_DIRECTORY}/${CACHE_DIRECTORY}`)) {
-//     fs.mkdirSync(`${SERVICE_DIRECTORY}/${CACHE_DIRECTORY}`);
-// }
