@@ -1,0 +1,26 @@
+{
+  "name": "volume-viewer-electron",
+  "version": "1.0.0",
+  "description": "embedding the volume viewer in electron",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron src/main/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imaging-tools/volume-viewer-electron.git"
+  },
+  "devDependencies": {
+    "electron": "^2.0.0"
+  },
+  "author": "hario90",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imaging-tools/volume-viewer-electron/issues"
+  },
+  "homepage": "https://github.com/imaging-tools/volume-viewer-electron#readme",
+  "dependencies": {
+    "volume-viewer": "^1.0.3"
+  }
+}
