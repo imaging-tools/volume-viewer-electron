@@ -109,4 +109,8 @@ function loadImageData(jsondata, volumedata) {
     })
 }
 
-//loadImageData(imgdata, channelVolumes);
+ipcRenderer.on('atlasCreated', (event, imgdata) => {
+    console.log('imgdata', imgdata);
+    loadImageData(JSON.parse(imgdata));
+});
+
