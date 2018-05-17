@@ -6,21 +6,30 @@
   </head>
   <body>
     <div id="drag-text">Drag Files Here</div>
-    <div id="drag-file"></div>
+    <div id="drag-file">
+      <div id="title">Volume Viewer</div>
+    </div>
     <script>
       // You can also require other files to run in this process
       require('../src/renderer/renderer.js')
     </script>
   </body>
   <style>
-      body {
-          position: relative
-      }
-      #drag-text {
-          position: absolute;
-          top:6px;
-          left:6px;
-          color: white;
-      }
+    body {
+      position: relative;
+      color: white;
+    }
+    #drag-text {
+      position: absolute;
+      top:6px;
+      left:6px;
+    }
+    #title {
+      position: absolute;
+      top:50%;
+      height:10em;
+      margin-top:-5em;
+      left: 50%;
+    }
   </style>
 </html>

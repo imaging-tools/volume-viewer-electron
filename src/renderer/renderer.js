@@ -1,28 +1,30 @@
 var css = require('dom-css')
 const { ipcRenderer } = require('electron');
 
-let holder = document.getElementById('drag-file');
+let app = document.getElementById('drag-file');
 
-holder.ondragover = () => {
+app.ondragover = () => {
     return false;
 }
 
-holder.ondragleave = () => {
+app.ondragleave = () => {
     return false;
 }
 
-holder.ondragend = () => {
+app.ondragend = () => {
     return false;
 }
 
-holder.ondrop = (e) => {
+app.ondrop = (e) => {
     e.preventDefault()
+
+    const title = document.getElementById('title');
+    title.parentNode.removeChild(title);
 
     for (let f of e.dataTransfer.files) {
         console.log('File(s) you dragged here: ', f.path)
         ipcRenderer.send('filereceived', f.path)
     }
-
     return false
 }
 
@@ -36,14 +38,11 @@ var panel = control([
   {theme: 'dark', position: 'top-right'}
 )
 
-// var el = document.createElement('div')
-var el = holder;
-document.body.appendChild(el)
 
-css(el, {width: '100%', height: '100%'})
-css(document.body, {margin: '0px', padding: '0px'})
+css(app, {width: '100%', height: '100%', textAlign: 'center', color: 'white'})
+css(document.body, {margin: '0px', padding: '0px', backgroundColor:'black'})
 
-let view3D = new vol.AICSview3d(el)
+let view3D = new vol.AICSview3d(app)
 
 function onChannelDataReady() {
     console.log("Got channel data");
@@ -109,4 +108,4 @@ function loadImageData(jsondata, volumedata) {
     })
 }
 
-loadImageData(imgdata, channelVolumes);
+//loadImageData(imgdata, channelVolumes);
