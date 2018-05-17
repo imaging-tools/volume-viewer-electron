@@ -26,13 +26,13 @@ let imgdata = {
     "pixel_size_y": 0.065,
     "pixel_size_z": 0.29,
     "images": [{
-        "name": "AICS-10_5_5.ome.tif_atlas_0.png",
+        "name": "../example/AICS-10_5_5.ome.tif_atlas_0.png",
         "channels": [0, 1, 2]
     }, {
-        "name": "AICS-10_5_5.ome.tif_atlas_1.png",
+        "name": "../example/AICS-10_5_5.ome.tif_atlas_1.png",
         "channels": [3, 4, 5]
     }, {
-        "name": "AICS-10_5_5.ome.tif_atlas_2.png",
+        "name": "../example/AICS-10_5_5.ome.tif_atlas_2.png",
         "channels": [6, 7, 8]
     }],
     "name": "AICS-10_5_5",
@@ -47,7 +47,7 @@ for (var i = 0; i < imgdata.channels; ++i) {
     var sv = vol.AICSmakeVolumes.createSphere(imgdata.tile_width, imgdata.tile_height, imgdata.tiles, 16);
     channelVolumes.push(sv);
   }
-  else{
+  else {
     var sv = vol.AICSmakeVolumes.createTorus(imgdata.tile_width, imgdata.tile_height, imgdata.tiles, 32, 8);
     channelVolumes.push(sv);
 
@@ -56,7 +56,7 @@ for (var i = 0; i < imgdata.channels; ++i) {
 
 function loadImageData(jsondata, volumedata) {
     view3D.resize();
-    jsondata.volumedata = volumedata;
+    //jsondata.volumedata = volumedata;
     const aimg = new vol.AICSvolumeDrawable(jsondata, "test");
     view3D.setCameraMode('3D');
     view3D.setImage(aimg, onChannelDataReady);
