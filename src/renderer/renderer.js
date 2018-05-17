@@ -1,15 +1,43 @@
 var css = require('dom-css')
+const { ipcRenderer } = require('electron');
+
+let holder = document.getElementById('drag-file');
+
+holder.ondragover = () => {
+    return false;
+}
+
+holder.ondragleave = () => {
+    return false;
+}
+
+holder.ondragend = () => {
+    return false;
+}
+
+holder.ondrop = (e) => {
+    e.preventDefault()
+
+    for (let f of e.dataTransfer.files) {
+        console.log('File(s) you dragged here: ', f.path)
+        ipcRenderer.send('filereceived', f.path)
+    }
+
+    return false
+}
+
 var vol = require('volume-viewer')
 var control = require('control-panel')
 
 var panel = control([
   {type: 'range', label: 'brightness', min: 0, max: 3, initial: 1},
   {type: 'range', label: 'density', min: 0, max: 1, initial: 0.1}
-], 
+],
   {theme: 'dark', position: 'top-right'}
 )
 
-var el = document.createElement('div')
+// var el = document.createElement('div')
+var el = holder;
 document.body.appendChild(el)
 
 css(el, {width: '100%', height: '100%'})
