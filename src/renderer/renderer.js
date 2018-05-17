@@ -1,7 +1,19 @@
+var css = require('dom-css')
 var vol = require('volume-viewer')
+var control = require('control-panel')
+
+var panel = control([
+  {type: 'range', label: 'brightness', min: 0, max: 3, initial: 1},
+  {type: 'range', label: 'density', min: 0, max: 1, initial: 0.1}
+], 
+  {theme: 'dark', position: 'top-right'}
+)
 
 var el = document.createElement('div')
 document.body.appendChild(el)
+
+css(el, {width: '100%', height: '100%'})
+css(document.body, {margin: '0px', padding: '0px'})
 
 let view3D = new vol.AICSview3d(el)
 
@@ -62,6 +74,11 @@ function loadImageData(jsondata, volumedata) {
     view3D.setImage(aimg, onChannelDataReady);
     aimg.setDensity(0.1);
     aimg.setBrightness(1.0);
+
+    panel.on('input', function (data) {
+        aimg.setBrightness(data['brightness'])
+        aimg.setDensity(data['density'])
+    })
 }
 
 loadImageData(imgdata, channelVolumes);
