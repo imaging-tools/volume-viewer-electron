@@ -95,7 +95,6 @@ for (var i = 0; i < imgdata.channels; ++i) {
 
 function loadImageData(jsondata, volumedata) {
     view3D.resize();
-    //jsondata.volumedata = volumedata;
     const aimg = new vol.AICSvolumeDrawable(jsondata, "test");
     view3D.setCameraMode('3D');
     view3D.setImage(aimg, onChannelDataReady);
