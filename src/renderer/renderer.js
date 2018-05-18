@@ -29,19 +29,17 @@ holder.ondrop = (e) => {
 var vol = require('volume-viewer')
 var control = require('control-panel')
 
-var panel = control([
+var inputs = [
   {type: 'range', label: 'brightness', min: 0, max: 3, initial: 1},
-  {type: 'range', label: 'density', min: 0, max: 1, initial: 0.1}
-],
-  {theme: 'dark', position: 'top-right'}
-)
+  {type: 'range', label: 'density', min: 0, max: 1, initial: 0.1},
+  {type: 'checkbox', label: 'maxProject', initial: false}
+]
 
-// var el = document.createElement('div')
 var el = holder;
 document.body.appendChild(el)
 
 css(el, {width: '100%', height: '100%'})
-css(document.body, {margin: '0px', padding: '0px'})
+css(document.body, {margin: '0px', padding: '0px', background: 'black'})
 
 let view3D = new vol.AICSview3d(el)
 
@@ -94,17 +92,94 @@ for (var i = 0; i < imgdata.channels; ++i) {
   }
 }
 
+const defaultColors = [
+    [226, 205, 179],
+    [111, 186, 17],
+    [141, 163, 192],
+    [245, 241, 203],
+    [224, 227, 209],
+    [221, 155, 245],
+    [227, 244, 245],
+    [255, 98, 0],
+    [247, 219, 120],
+    [249, 165, 88],
+    [218, 214, 235],
+    [235, 26, 206],
+    [36, 188, 250],
+    [111, 186, 17],
+    [167, 151, 119],
+    [207, 198, 207],
+    [249, 165, 88],
+    [247, 85, 67],
+    [141, 163, 192],
+    [152, 176, 214],
+    [17, 168, 154],
+    [150, 0, 24],
+    [253, 219, 2],
+    [231, 220, 190],
+    [226, 205, 179],
+    [235, 213, 210],
+    [227, 244, 245],
+    [240, 236, 221],
+    [219, 232, 209],
+    [224, 227, 209],
+    [222, 213, 193],
+    [136, 136, 136],
+    [240, 224, 211],
+    [244, 212, 215],
+    [247, 250, 252],
+    [213, 222, 240],
+    [87, 249, 235]
+];
+
+const getColorByChannelIndex = (index) => {
+    return defaultColors[index] ? defaultColors[index] : [141, 163, 192];
+};
+
+const colorFromArray = (val) => {
+    return 'rgb(' + val[0] + ',' + val[1] + ',' + val[2] + ')'
+}
+
 function loadImageData(jsondata, volumedata) {
     view3D.resize();
     const aimg = new vol.AICSvolumeDrawable(jsondata, "test");
+
+    aimg.channel_names.forEach(function (d, i) {
+      var colors = [colorFromArray(getColorByChannelIndex(i)), colorFromArray(getColorByChannelIndex(i))]
+      inputs.push({type: 'multibox', label: d, count: 2, names: ['vol', 'iso'], colors: colors, initial: [true, false]})
+    })
+
+    var panel = control(inputs, {theme: 'dark', position: 'top-right', width: '250px'})
+
     view3D.setCameraMode('3D');
     view3D.setImage(aimg, onChannelDataReady);
     aimg.setDensity(0.1);
     aimg.setBrightness(1.0);
+    aimg.setUniform('maxProject', 0, true, true)
+
+    aimg.channel_names.forEach(function (d, i) {
+        aimg.updateChannelColor(i, getColorByChannelIndex(i))
+    })
 
     panel.on('input', function (data) {
-        aimg.setBrightness(data['brightness'])
-        aimg.setDensity(data['density'])
+      aimg.setBrightness(data['brightness'])
+      aimg.setDensity(data['density'])
+      aimg.setUniform('maxProject', data['maxProject'] ? 1 : 0, true, true)
+
+      aimg.channel_names.forEach(function (d, i) {
+        aimg.setVolumeChannelEnabled(i, data[d][0])
+        if (aimg.hasIsosurface(i)) {
+          if (!data[d][1]) {
+            aimg.destroyIsosurface(i)
+          }
+        }
+        else {
+          if (data[d][1]) {
+            aimg.createIsosurface(i, 50, 1);
+          }
+        }
+      })
+      aimg.fuse()
     })
 }
 
