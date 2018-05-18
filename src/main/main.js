@@ -86,17 +86,13 @@ function getFilePathsAndName(filePath, fileName) {
     return {srcPath, relCachePath, fullFolderPath, fullAtlasJsonPath, name};
 }
 
-const PythonShell = require('python-shell');
+const exec = require('child_process').execFile;
 ipcMain.on('filereceived', (event, filePath) => {
     console.log('Received file ' + filePath);
     const {relCachePath, fullAtlasJsonPath} = getFilePathsAndName(filePath);
     const dest = path.join('.', SERVICE_DIRECTORY, relCachePath);
-    const options = {
-        pythonPath: '/Users/lisajoy/virtualenvs/aicsImage3/bin/python',
-        args: [filePath, dest]
-    };
 
-    PythonShell.run('convert.py', options, function (err, results) {
+    exec(`convert ${filePath} ${dest}`, (err) => {
         if (err) console.log(err);
         // results is an array consisting of messages collected during execution
         fs.readFile(fullAtlasJsonPath, 'utf8', (err, data) => {
