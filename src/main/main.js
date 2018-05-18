@@ -87,36 +87,42 @@ function getFilePathsAndName(filePath, fileName) {
 }
 
 const exec = require('child_process').execFile;
+const sendAtlasToRenderer = (event, fullAtlasJsonPath, relCachePath) => {
+    fs.readFile(fullAtlasJsonPath, 'utf8', (err, data) => {
+        if (err) {
+            console.log("error", err)
+        } else {
+            const atlas = JSON.parse(data);
+            atlas.images = atlas.images.map(i => {
+                return {
+                    ...i,
+                    name: `../${SERVICE_DIRECTORY}/${relCachePath}/${i.name}`
+                }
+            });
+            event.sender.send('atlasCreated', atlas);
+        }
+    });
+};
+const createAtlas = (event, filePath, dest, fullAtlasJsonPath, relCachePath) => {
+    console.log(`Creating atlas for ${filePath} and caching at ${dest}`);
+    exec('convert', [filePath, dest], (err) => {
+        if (err) console.log(err);
+        else {
+            sendAtlasToRenderer(event, fullAtlasJsonPath, relCachePath);
+        }
+    });
+};
 ipcMain.on('filereceived', (event, filePath) => {
     console.log('Received file ' + filePath);
     const {relCachePath, fullAtlasJsonPath} = getFilePathsAndName(filePath);
     const dest = path.join(__dirname, '../../', SERVICE_DIRECTORY, relCachePath);
 
     if (!fs.existsSync(dest)) {
-        console.log('making dir', dest)
+        console.log('Cache directory not found.', dest);
         fs.mkdirSync(dest);
+        createAtlas(event, filePath, dest, fullAtlasJsonPath, relCachePath);
     } else {
-        console.log('dir EXISTS', dest)
+        console.log('Cache directory exists, returning cached', dest);
+        sendAtlasToRenderer(event, fullAtlasJsonPath, relCachePath);
     }
-
-    exec('convert', [filePath, dest], (err) => {
-        if (err) console.log(err);
-        else {
-            // results is an array consisting of messages collected during execution
-            fs.readFile(fullAtlasJsonPath, 'utf8', (err, data) => {
-                if (err) {
-                    console.log("error", err)
-                } else {
-                    const atlas = JSON.parse(data);
-                    atlas.images = atlas.images.map(i => {
-                        return {
-                            ...i,
-                            name: `../${SERVICE_DIRECTORY}/${relCachePath}/${i.name}`
-                        }
-                    });
-                    event.sender.send('atlasCreated', atlas);
-                }
-            });
-        }
-    });
 });
