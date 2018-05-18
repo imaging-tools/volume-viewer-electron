@@ -1,8 +1,9 @@
-const { ipcMain, app, BrowserWindow, Menu } = require('electron');
+const { ipcMain, app, BrowserWindow } = require('electron');
 const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');
 const crypto = require('crypto');
+const exec = require('child_process').execFile;
 const {CACHE_DIRECTORY, SERVICE_DIRECTORY} = require('./constants');
 
 // Set up directory /image-service/cache
@@ -86,7 +87,6 @@ function getFilePathsAndName(filePath, fileName) {
     return {srcPath, relCachePath, fullFolderPath, fullAtlasJsonPath, name};
 }
 
-const exec = require('child_process').execFile;
 const sendAtlasToRenderer = (event, fullAtlasJsonPath, relCachePath) => {
     fs.readFile(fullAtlasJsonPath, 'utf8', (err, data) => {
         if (err) {
@@ -105,7 +105,7 @@ const sendAtlasToRenderer = (event, fullAtlasJsonPath, relCachePath) => {
 };
 const createAtlas = (event, filePath, dest, fullAtlasJsonPath, relCachePath) => {
     console.log(`Creating atlas for ${filePath} and caching at ${dest}`);
-    exec('convert', [filePath, dest], (err) => {
+    exec(path.join(__dirname, '../../', 'convert'), [filePath, dest], (err) => {
         if (err) console.log(err);
         else {
             sendAtlasToRenderer(event, fullAtlasJsonPath, relCachePath);
