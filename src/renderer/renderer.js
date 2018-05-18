@@ -38,11 +38,11 @@ var inputs = [
   {type: 'range', label: 'density', min: 0, max: 1, initial: 0.1},
   {type: 'checkbox', label: 'maxProject', initial: false}
 ]
-
-css(app, {width: '100%', height: '100%', textAlign: 'center', color: 'white'})
+css(app, {textAlign: 'center', color: 'white'})
 css(document.body, {margin: '0px', padding: '0px', backgroundColor:'black'})
 
 let view3D = new vol.AICSview3d(app)
+resizeToWindow();
 
 function onChannelDataReady() {
     console.log("Got channel data");
@@ -176,3 +176,8 @@ ipcRenderer.on('atlasCreated', (event, imgdata) => {
     loadImageData(imgdata);
 });
 
+function resizeToWindow() {
+    css(app, {width: window.innerWidth, height: window.innerHeight, textAlign: 'center', color: 'white'})
+    view3D.resize();
+}
+window.addEventListener("resize", resizeToWindow);
