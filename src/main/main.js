@@ -103,7 +103,14 @@ ipcMain.on('filereceived', (event, filePath) => {
             if (err) {
                 console.log("error", err)
             } else {
-                event.sender.send('atlasCreated', data);
+                const atlas = JSON.parse(data);
+                atlas.images = atlas.images.map(i => {
+                    return {
+                        ...i,
+                        name: `../${SERVICE_DIRECTORY}/${relCachePath}/${i.name}`
+                    }
+                });
+                event.sender.send('atlasCreated', atlas);
             }
         });
     });
