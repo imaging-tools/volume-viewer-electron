@@ -90,24 +90,33 @@ const exec = require('child_process').execFile;
 ipcMain.on('filereceived', (event, filePath) => {
     console.log('Received file ' + filePath);
     const {relCachePath, fullAtlasJsonPath} = getFilePathsAndName(filePath);
-    const dest = path.join('.', SERVICE_DIRECTORY, relCachePath);
+    const dest = path.join(__dirname, '../../', SERVICE_DIRECTORY, relCachePath);
 
-    exec(`convert ${filePath} ${dest}`, (err) => {
+    if (!fs.existsSync(dest)) {
+        console.log('making dir', dest)
+        fs.mkdirSync(dest);
+    } else {
+        console.log('dir EXISTS', dest)
+    }
+
+    exec('convert', [filePath, dest], (err) => {
         if (err) console.log(err);
-        // results is an array consisting of messages collected during execution
-        fs.readFile(fullAtlasJsonPath, 'utf8', (err, data) => {
-            if (err) {
-                console.log("error", err)
-            } else {
-                const atlas = JSON.parse(data);
-                atlas.images = atlas.images.map(i => {
-                    return {
-                        ...i,
-                        name: `../${SERVICE_DIRECTORY}/${relCachePath}/${i.name}`
-                    }
-                });
-                event.sender.send('atlasCreated', atlas);
-            }
-        });
+        else {
+            // results is an array consisting of messages collected during execution
+            fs.readFile(fullAtlasJsonPath, 'utf8', (err, data) => {
+                if (err) {
+                    console.log("error", err)
+                } else {
+                    const atlas = JSON.parse(data);
+                    atlas.images = atlas.images.map(i => {
+                        return {
+                            ...i,
+                            name: `../${SERVICE_DIRECTORY}/${relCachePath}/${i.name}`
+                        }
+                    });
+                    event.sender.send('atlasCreated', atlas);
+                }
+            });
+        }
     });
 });
