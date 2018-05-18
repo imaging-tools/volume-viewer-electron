@@ -188,6 +188,6 @@ loadImageData(imgdata);
 
 ipcRenderer.on('atlasCreated', (event, imgdata) => {
     console.log('imgdata', imgdata);
-    loadImageData(JSON.parse(imgdata));
+    loadImageData(imgdata);
 });
 
