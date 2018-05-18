@@ -1,4 +1,4 @@
-const { ipcMain, app, BrowserWindow } = require('electron');
+const { ipcMain, app, BrowserWindow, Menu } = require('electron');
 const fs = require('fs-extra');
 const path = require('path');
 const url = require('url');

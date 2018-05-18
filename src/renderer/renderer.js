@@ -80,19 +80,6 @@ let imgdata = {
     "aicsImageVersion": "0.3.0"
 };
 
-var channelVolumes = [];
-for (var i = 0; i < imgdata.channels; ++i) {
-  if (i % 2 === 0) {
-    var sv = vol.AICSmakeVolumes.createSphere(imgdata.tile_width, imgdata.tile_height, imgdata.tiles, 16);
-    channelVolumes.push(sv);
-  }
-  else {
-    var sv = vol.AICSmakeVolumes.createTorus(imgdata.tile_width, imgdata.tile_height, imgdata.tiles, 32, 8);
-    channelVolumes.push(sv);
-
-  }
-}
-
 const defaultColors = [
     [226, 205, 179],
     [111, 186, 17],
@@ -141,7 +128,7 @@ const colorFromArray = (val) => {
     return 'rgb(' + val[0] + ',' + val[1] + ',' + val[2] + ')'
 }
 
-function loadImageData(jsondata, volumedata) {
+function loadImageData(jsondata) {
     view3D.resize();
     const aimg = new vol.AICSvolumeDrawable(jsondata, "test");
 
