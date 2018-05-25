@@ -24,6 +24,6 @@
     "control-panel": "^1.3.3",
     "dom-css": "^2.1.0",
     "fs-extra": "^6.0.1",
-    "volume-viewer": "^1.0.3"
+    "volume-viewer": "^1.0.7"
   }
 }
