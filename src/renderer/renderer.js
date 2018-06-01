@@ -141,6 +141,9 @@ function loadImageData(jsondata) {
 
     view3D.setCameraMode('3D');
     view3D.setImage(aimg, onChannelDataReady);
+    vol.AICSvolumeLoader.loadVolumeAtlasData(jsondata.images, (url, channelIndex, atlasdata, atlaswidth, atlasheight) => {
+        aimg.setChannelDataFromAtlas(channelIndex, atlasdata, atlaswidth, atlasheight);
+    });
     aimg.setDensity(0.1);
     aimg.setBrightness(1.0);
     aimg.setUniform('maxProject', 0, true, true)
